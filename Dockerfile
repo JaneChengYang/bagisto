@@ -40,7 +40,7 @@ ENV APACHE_DOCUMENT_ROOT /var/www/html/public
 RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' \
     /etc/apache2/sites-available/*.conf
 
-RUN printf '#!/bin/bash\nset -e\nphp artisan migrate --force || true\nphp artisan db:seed --force || true\nexec apache2-foreground\n' \
+RUN printf '#!/bin/bash\nset -e\nphp artisan migrate --force\nexec apache2-foreground\n' \
     > /entrypoint.sh && chmod +x /entrypoint.sh
 
 EXPOSE 80
