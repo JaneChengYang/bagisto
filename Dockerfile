@@ -16,6 +16,10 @@ COPY . .
 
 RUN composer install --optimize-autoloader --no-dev --no-interaction --ignore-platform-reqs
 
+COPY .env.example .env
+
+RUN php artisan key:generate --force
+
 RUN chown -R www-data:www-data storage bootstrap/cache \
     && chmod -R 775 storage bootstrap/cache
 
@@ -24,15 +28,6 @@ RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' \
     /etc/apache2/sites-available/*.conf
 
 RUN echo '#!/bin/bash' > /entrypoint.sh && \
-    echo 'set -e' >> /entrypoint.sh && \
-    echo 'cp .env.example .env' >> /entrypoint.sh && \
-    echo 'sed -i "s|DB_HOST=.*|DB_HOST=${DB_HOST}|" .env' >> /entrypoint.sh && \
-    echo 'sed -i "s|DB_PORT=.*|DB_PORT=${DB_PORT}|" .env' >> /entrypoint.sh && \
-    echo 'sed -i "s|DB_DATABASE=.*|DB_DATABASE=${DB_DATABASE}|" .env' >> /entrypoint.sh && \
-    echo 'sed -i "s|DB_USERNAME=.*|DB_USERNAME=${DB_USERNAME}|" .env' >> /entrypoint.sh && \
-    echo 'sed -i "s|DB_PASSWORD=.*|DB_PASSWORD=${DB_PASSWORD}|" .env' >> /entrypoint.sh && \
-    echo 'sed -i "s|DB_CONNECTION=.*|DB_CONNECTION=mysql|" .env' >> /entrypoint.sh && \
-    echo 'php artisan key:generate --force' >> /entrypoint.sh && \
     echo 'php artisan migrate --force --seed' >> /entrypoint.sh && \
     echo 'exec apache2-foreground' >> /entrypoint.sh && \
     chmod +x /entrypoint.sh
