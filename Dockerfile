@@ -11,6 +11,7 @@ WORKDIR /var/www/html
 COPY . .
 
 RUN composer install --optimize-autoloader --no-dev --no-interaction --ignore-platform-reqs
+RUN composer require league/flysystem-aws-s3-v3 --no-interaction --ignore-platform-reqs
 
 RUN cat > /var/www/html/.env << 'EOF'
 APP_NAME=Bagisto
@@ -27,6 +28,13 @@ CACHE_DRIVER=file
 SESSION_DRIVER=file
 QUEUE_CONNECTION=sync
 LOG_CHANNEL=stderr
+FILESYSTEM_DISK=s3
+AWS_ACCESS_KEY_ID=4dcd092b37f8d0a3ecf5696e084943bc
+AWS_SECRET_ACCESS_KEY=aea553e3934fa34dfda118bceb2518e5778211b6b9fc2eb6374e71af6ee58054
+AWS_DEFAULT_REGION=auto
+AWS_BUCKET=bagisto-storage
+AWS_ENDPOINT=https://dcf82d8068cc6364132b9f15397e7d82.r2.cloudflarestorage.com
+AWS_USE_PATH_STYLE_ENDPOINT=true
 EOF
 
 RUN php artisan key:generate --force
