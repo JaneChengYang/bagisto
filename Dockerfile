@@ -1,16 +1,10 @@
-FROM php:8.3-apache
+FROM php:8.3-cli
 
 RUN apt-get update && apt-get install -y \
     git curl zip unzip libpng-dev libonig-dev \
     libxml2-dev libzip-dev libicu-dev \
     && docker-php-ext-install \
-    pdo pdo_mysql mbstring xml zip gd bcmath intl opcache calendar \
-    && a2enmod rewrite
-
-RUN echo "ServerName localhost" >> /etc/apache2/apache2.conf \
-    && find /etc/apache2/mods-enabled/ -name "mpm_*" -delete \
-    && ln -s /etc/apache2/mods-available/mpm_prefork.conf /etc/apache2/mods-enabled/ \
-    && ln -s /etc/apache2/mods-available/mpm_prefork.load /etc/apache2/mods-enabled/
+    pdo pdo_mysql mbstring xml zip gd bcmath intl opcache calendar
 
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 WORKDIR /var/www/html
@@ -40,12 +34,8 @@ RUN php artisan key:generate --force
 RUN chown -R www-data:www-data storage bootstrap/cache \
     && chmod -R 775 storage bootstrap/cache
 
-ENV APACHE_DOCUMENT_ROOT /var/www/html/public
-RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' \
-    /etc/apache2/sites-available/*.conf
-
-RUN printf '#!/bin/bash\nset -e\nphp artisan migrate --force\nexec apache2-foreground\n' \
+RUN printf '#!/bin/bash\nset -e\nphp artisan migrate --force\nexec php artisan serve --host=0.0.0.0 --port=8080\n' \
     > /entrypoint.sh && chmod +x /entrypoint.sh
 
-EXPOSE 80
+EXPOSE 8080
 CMD ["/entrypoint.sh"]
