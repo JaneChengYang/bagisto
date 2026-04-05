@@ -34,7 +34,7 @@ RUN php artisan key:generate --force
 RUN chown -R www-data:www-data storage bootstrap/cache \
     && chmod -R 775 storage bootstrap/cache
 
-RUN printf '#!/bin/bash\nset -e\nphp artisan migrate --force\nexec php artisan serve --host=0.0.0.0 --port=8080\n' \
+RUN printf '#!/bin/bash\nset -e\nphp artisan migrate --force\nphp artisan storage:link\nexec php artisan serve --host=0.0.0.0 --port=8080\n' \
     > /entrypoint.sh && chmod +x /entrypoint.sh
 
 EXPOSE 8080
