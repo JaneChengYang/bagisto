@@ -23,22 +23,19 @@ ENV APACHE_DOCUMENT_ROOT /var/www/html/public
 RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' \
     /etc/apache2/sites-available/*.conf
 
-RUN printf '#!/bin/bash\nset -e\n\
-cp .env.example .env\n\
-echo "APP_KEY=" >> .env\n\
-echo "DB_CONNECTION=mysql" >> .env\n\
-echo "DB_HOST=$DB_HOST" >> .env\n\
-echo "DB_PORT=$DB_PORT" >> .env\n\
-echo "DB_DATABASE=$DB_DATABASE" >> .env\n\
-echo "DB_USERNAME=$DB_USERNAME" >> .env\n\
-echo "DB_PASSWORD=$DB_PASSWORD" >> .env\n\
-echo "APP_URL=$APP_URL" >> .env\n\
-echo "CACHE_DRIVER=file" >> .env\n\
-echo "SESSION_DRIVER=file" >> .env\n\
-php artisan key:generate --force\n\
-php artisan migrate --force --seed\n\
-exec apache2-foreground\n' > /entrypoint.sh \
-    && chmod +x /entrypoint.sh
+RUN echo '#!/bin/bash' > /entrypoint.sh && \
+    echo 'set -e' >> /entrypoint.sh && \
+    echo 'cp .env.example .env' >> /entrypoint.sh && \
+    echo 'sed -i "s|DB_HOST=.*|DB_HOST=${DB_HOST}|" .env' >> /entrypoint.sh && \
+    echo 'sed -i "s|DB_PORT=.*|DB_PORT=${DB_PORT}|" .env' >> /entrypoint.sh && \
+    echo 'sed -i "s|DB_DATABASE=.*|DB_DATABASE=${DB_DATABASE}|" .env' >> /entrypoint.sh && \
+    echo 'sed -i "s|DB_USERNAME=.*|DB_USERNAME=${DB_USERNAME}|" .env' >> /entrypoint.sh && \
+    echo 'sed -i "s|DB_PASSWORD=.*|DB_PASSWORD=${DB_PASSWORD}|" .env' >> /entrypoint.sh && \
+    echo 'sed -i "s|DB_CONNECTION=.*|DB_CONNECTION=mysql|" .env' >> /entrypoint.sh && \
+    echo 'php artisan key:generate --force' >> /entrypoint.sh && \
+    echo 'php artisan migrate --force --seed' >> /entrypoint.sh && \
+    echo 'exec apache2-foreground' >> /entrypoint.sh && \
+    chmod +x /entrypoint.sh
 
 EXPOSE 80
 CMD ["/entrypoint.sh"]
