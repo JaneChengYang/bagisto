@@ -2,7 +2,7 @@ FROM php:8.3-apache
 
 RUN apt-get update && apt-get install -y \
     git curl zip unzip libpng-dev libonig-dev \
-    libxml2-dev libzip-dev libicu-dev libcal-dev \
+    libxml2-dev libzip-dev libicu-dev \
     && docker-php-ext-install \
     pdo pdo_mysql mbstring xml zip gd bcmath intl opcache calendar \
     && a2enmod rewrite
@@ -13,7 +13,7 @@ WORKDIR /var/www/html
 
 COPY . .
 
-RUN composer install --optimize-autoloader --no-dev --no-interaction --ignore-platform-req=ext-calendar
+RUN composer install --optimize-autoloader --no-dev --no-interaction --ignore-platform-reqs
 
 COPY .env.example .env
 
