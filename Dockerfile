@@ -5,7 +5,8 @@ RUN apt-get update && apt-get install -y \
     libxml2-dev libzip-dev libicu-dev \
     && docker-php-ext-install \
     pdo pdo_mysql mbstring xml zip gd bcmath intl opcache calendar \
-    && a2dismod mpm_event && a2enmod mpm_prefork rewrite
+    && a2dismod mpm_event mpm_worker mpm_prefork \
+    && a2enmod mpm_prefork rewrite
 
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
