@@ -31,10 +31,7 @@ EOF
 
 RUN php artisan key:generate --force
 
-RUN printf '#!/bin/bash\nset -e\nphp artisan migrate --force\nphp artisan storage:link --force\nchmod -R 777 /var/www/html/storage\nexec php artisan serve --host=0.0.0.0 --port=8080\n' \
-    > /entrypoint.sh && chmod +x /entrypoint.sh
-
-RUN printf '#!/bin/bash\nset -e\nphp artisan migrate --force\nphp artisan storage:link\nexec php artisan serve --host=0.0.0.0 --port=8080\n' \
+RUN printf '#!/bin/bash\nset -e\nphp artisan migrate --force\nrm -f /var/www/html/public/storage\nln -s /var/www/html/storage/app/public /var/www/html/public/storage\nchmod -R 777 /var/www/html/storage\nexec php artisan serve --host=0.0.0.0 --port=8080\n' \
     > /entrypoint.sh && chmod +x /entrypoint.sh
 
 EXPOSE 8080
