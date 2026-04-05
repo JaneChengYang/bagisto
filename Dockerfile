@@ -27,8 +27,8 @@ ENV APACHE_DOCUMENT_ROOT /var/www/html/public
 RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' \
     /etc/apache2/sites-available/*.conf
 
-COPY entrypoint.sh /entrypoint.sh
-RUN chmod +x /entrypoint.sh
+RUN printf '#!/bin/bash\nset -e\nphp artisan migrate --force --seed\nexec apache2-foreground\n' > /entrypoint.sh \
+    && chmod +x /entrypoint.sh
 
 EXPOSE 80
 CMD ["/entrypoint.sh"]
