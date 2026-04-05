@@ -31,8 +31,8 @@ EOF
 
 RUN php artisan key:generate --force
 
-RUN chown -R www-data:www-data storage bootstrap/cache public \
-    && chmod -R 777 storage bootstrap/cache public
+RUN printf '#!/bin/bash\nset -e\nphp artisan migrate --force\nphp artisan storage:link --force\nchmod -R 777 /var/www/html/storage\nexec php artisan serve --host=0.0.0.0 --port=8080\n' \
+    > /entrypoint.sh && chmod +x /entrypoint.sh
 
 RUN printf '#!/bin/bash\nset -e\nphp artisan migrate --force\nphp artisan storage:link\nexec php artisan serve --host=0.0.0.0 --port=8080\n' \
     > /entrypoint.sh && chmod +x /entrypoint.sh
