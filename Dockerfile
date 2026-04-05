@@ -2,7 +2,8 @@ FROM php:8.3-cli
 
 RUN apt-get update && apt-get install -y \
     git curl zip unzip libpng-dev libonig-dev \
-    libxml2-dev libzip-dev libicu-dev \
+    libxml2-dev libzip-dev libicu-dev libwebp-dev \
+    && docker-php-ext-configure gd --with-webp \
     && docker-php-ext-install \
     pdo pdo_mysql mbstring xml zip gd bcmath intl opcache calendar
 
